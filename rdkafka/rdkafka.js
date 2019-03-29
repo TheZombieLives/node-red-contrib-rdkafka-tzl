@@ -7,6 +7,15 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, n);
         this.broker = n.broker;
         this.clientid = n.clientid;
+        this.securityProtocol = n.securityProtocol?n.securityProtocol:"plaintext";
+
+        if (n.securityProtocol === 'ssl') {
+            this.sslCertLocation = n.sslCertLocation;
+            this.sslCaLocation = n.sslCaLocation;
+            this.sslKeyLocation = n.sslKeyLocation;
+            this.sslKeyPassword = n.sslKeyPassword;
+        }
+
     }
     RED.nodes.registerType("kafka-broker", KafkaBrokerNode, {});
 
@@ -118,6 +127,7 @@ module.exports = function(RED) {
         this.brokerConfig = RED.nodes.getNode(this.broker);
         var node = this;
         var producer;
+        var kafkaConfig;
 
         if (node.brokerConfig !== undefined) {
             node.status({
@@ -127,7 +137,7 @@ module.exports = function(RED) {
             });
 
             try {
-                producer = new Kafka.Producer({
+                kafkaConfig = {
                     'client.id': node.brokerConfig.clientid,
                     'metadata.broker.list': node.brokerConfig.broker,
                     //'compression.codec': 'gzip',
@@ -137,8 +147,24 @@ module.exports = function(RED) {
                     'queue.buffering.max.messages': 100000,
                     'queue.buffering.max.ms': 10,
                     'batch.num.messages': 1000000,
-                    'api.version.request': true  //added to force 0.10.x style timestamps on all messages
-                });
+                    'api.version.request': true,  //added to force 0.10.x style timestamps on all messages
+                    'security.protocol': node.brokerConfig.securityProtocol
+                };
+
+                // Are we using ssl?
+                if (node.brokerConfig.securityProtocol === 'ssl') {
+                    kafkaConfig = Object.assign({'ssl.certificate.location': node.brokerConfig.sslCertLocation}, kafkaConfig);
+                    kafkaConfig = Object.assign({'ssl.ca.location': node.brokerConfig.sslCaLocation}, kafkaConfig);
+                    kafkaConfig = Object.assign({'ssl.key.location': node.brokerConfig.sslKeyLocation}, kafkaConfig);
+                    kafkaConfig = Object.assign({'ssl.key.password': node.brokerConfig.sslKeyPassword}, kafkaConfig);  
+                //} else {
+                //     kafkaConfig = Object.assign({'ssl.keystore.location': node.brokerConfig.sslKeystoreLocation}, kafkaConfig)
+                //     kafkaConfig = Object.assign({'ssl.keystore.password': node.brokerConfig.sslKeystorePassword}, kafkaConfig)   
+                }
+
+                util.log('[rdkafka] Config: ' + JSON.stringify(kafkaConfig));
+
+                producer = new Kafka.Producer(kafkaConfig);
 
                 // Connect to the broker manually
                 producer.connect();
@@ -177,7 +203,7 @@ module.exports = function(RED) {
                 } else if(msg.partition && Number.isInteger(msg.partition) && Number(msg.partition) >= 0) {
                     partition = Number(msg.partition);
                 } else {
-                    partition = -1;
+                    partition = null;
                 }
 
                 //set the key
@@ -213,13 +239,18 @@ module.exports = function(RED) {
                 if (msg === null || topic === "") {
                     util.log("[rdkafka] ignored request to send a NULL message or NULL topic");
                 } else {
-                    producer.produce(
-                      topic,                                // topic
-                      partition,                            // partition
-                      new Buffer(value),                    // value
-                      key,                                  // key
-                      timestamp                             // timestamp
-                    );
+                    try {
+                        producer.produce(
+                          topic,                                // topic
+                          partition,                            // partition
+                          new Buffer(value),                    // value
+                          key,                                  // key
+                          timestamp                             // timestamp
+                        );
+                        console.log('[rdkafka] Message sent successfully: topic ' + topic + ' | partition ' + partition + ' | value ' + value);
+                    } catch (err) {
+                        console.log('[rdkafka] failed to send message: topic ' + topic + ' | partition ' + partition + ' | value ' + value + '\n', err);
+                    }
                 }
             });
         } else {

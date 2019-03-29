@@ -1,5 +1,3 @@
-
-
 <script type="text/x-red" data-template-name="rdkafka in">
     <div class="form-row">
         <label for="node-input-broker"><i class="icon-tag"></i> Broker</label>
@@ -20,8 +18,8 @@
 </script>
 
 <script type="text/x-red" data-help-name="rdkafka in">
-    <p>Kafka input node. Connects to a broker and subscribes to the specified topic. The topic may contain Kafka wildcard regular expression.
-    </script>
+    <p>Kafka input node. Connects to a broker and subscribes to the specified topic. The topic may contain Kafka wildcard regular expression.</p>
+</script>
 
 <script type="text/javascript">
     RED.nodes.registerType('rdkafka in',{
@@ -62,7 +60,7 @@
     </div>
         <div class="form-row">
         <label for="node-input-partition"><i class="icon-tasks"></i> Partition</label>
-        <input type="number" id="node-input-partition" placeholder="Partition">
+        <input type="number" id="node-input-partition" placeholder="Partition (default valus is null)">
     </div>       
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
@@ -71,13 +69,14 @@
 </script>
 
 <script type="text/x-red" data-help-name="rdkafka out">
-    <p>Connects to a Kafka broker and publishes messages.
-    <p>If you want to publish Kafka messages in Key,Value format then either specify a static key value in the config dialog or (if blank) include a key string in the incoming <code>msg.key</code> field
-    <p>The Kafka topic to which messages are published can be specified as a static topic value in the config dialog or (if blank) included as a topic string in the incoming <code>msg.topic</code> field
-    <p>The Kafka partition to which messages are published can be specified as a static partition value in the config dialog or (if set to -1) included as a topic string in the incoming <code>msg.partition</code> field. If no partition is specified via either method then the default (round robin) Kafka partitioner is used.
-    <p>If you provide a valid timestamp by using the <code>msg.timestamp</code> field it will be added to the message as the event time, otherwise the current publish time will be used.
-    <p>If any values are set in both the configuration window and in the incoming message, then the configuration dialog value has precedence.
-    <p>The output of this node includes key_schema_id, value and <code>offsets</code> which is an array of objects containing the partition, offset, error_code, and error for each of the messages published. For example <code>{ offsets: [ { partition: 0, offset: 1071, error_code: null, error: null } ], key_schema_id: null, value_schema_id: null }</code>
+    <p>Connects to a Kafka broker and publishes messages.</p>
+    <p>If you want to publish Kafka messages in Key,Value format then either specify a static key value in the config dialog or (if blank) include a key string in the incoming <code>msg.key</code> field</p>
+    <p>The Kafka topic to which messages are published can be specified as a static topic value in the config dialog or (if blank) included as a topic string in the incoming <code>msg.topic</code> field</p>
+    <p>The Kafka partition to which messages are published can be specified as a static partition value in the config dialog or (if set to -1) included as a topic string in the incoming <code>msg.partition</code> field. If no partition is specified via either method then the default (round robin) Kafka partitioner is used.</p>
+    <p>If you provide a valid timestamp by using the <code>msg.timestamp</code> field it will be added to the message as the event time, otherwise the current publish time will be used.</p>
+    <p>If any values are set in both the configuration window and in the incoming message, then the configuration dialog value has precedence.</p>
+    <p>The output of this node includes key_schema_id, value and <code>offsets</code> which is an array of objects containing the partition, offset, error_code, and error for each of the messages published. For example <code>{ offsets: [ { partition: 0, offset: 1071, error_code: null, error: null } ], key_schema_id: null, value_schema_id: null }</code></p>
+    <p>The security protocol is either 'plaintext' (default) or 'ssl'</p>
 </script>
 
 <script type="text/javascript">
@@ -87,8 +86,8 @@
          name: {value:""},
          topic: {value:""},
          key: {value:""},
-         partition: {value:-1},         
-         broker: {type:"kafka-broker", required:true}
+         partition: {value:null},         
+         broker: {type:"kafka-broker", required:true},
        },
        color:"#FFFFFF",
        inputs:1,
@@ -113,6 +112,37 @@
         <label for="node-config-input-clientid"><i class="icon-tag"></i> Client ID</label>
         <input type="text" id="node-config-input-clientid" placeholder="Leave blank for auto generated">
     </div>
+    <div class="form-row">
+        <label for="node-config-input-securityProtocol"><i class="icon-tag"></i> Security Protocol</label>
+        <select id="node-config-input-securityProtocol">
+          <option value="plaintext" selected>plaintext</option>
+          <option value="ssl">ssl</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-sslCertLocation"><i class="icon-tag"></i> SSL Certificate location</label>
+        <input type="text" id="node-config-input-sslCertLocation" placeholder="Cert location">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-sslCaLocation"><i class="icon-tag"></i> SSL CA location</label>
+        <input type="text" id="node-config-input-sslCaLocation" placeholder="CA Location">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-sslKeyLocation"><i class="icon-tag"></i> SSL Key location</label>
+        <input type="text" id="node-config-input-sslKeyLocation" placeholder="Key location">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-sslKeyPassword"><i class="icon-tag"></i> SSL Key password</label>
+        <input type="password" id="node-config-input-sslKeyPassword" placeholder="SSL Key password">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-sslKeystoreLocation"><i class="icon-tag"></i> SSL Keystore location</label>
+        <input type="text" id="node-config-input-sslKeystoreLocation" placeholder="Keystore location">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-sslKeystorePassword"><i class="icon-tag"></i> SSL Keystore password</label>
+        <input type="password" id="node-config-input-sslKeystorePassword" placeholder="SSL Keystore password">
+    </div>
     <div class="form-tips">
         <b>Note:</b>The "Broker List" is a list of Kafka Brokers in the form HOST1:PORT1[,HOST2:PORT2[...]]
     </div>
@@ -123,7 +153,14 @@
         category: 'config',
         defaults: {
             broker: { value:"",required:true },
-            clientid: { value:"" }
+            clientid: { value:"" },
+            securityProtocol: { value:"plaintext" },
+            sslCertLocation: {value:""},
+            sslCaLocation: {value:""},
+            sslKeyLocation: {value:""},
+            sslKeyPassword: {value:""},
+            sslKeystoreLocation: {value:""},
+            sslKeystorePassword: {value:""}
         },
         label: function() {
             if (this.broker == "") { this.broker = "localhost:9092"; }
