@@ -30,7 +30,7 @@ This project was forked from https://github.com/hjespers/node-red-contrib-rdkafk
 
 Run the following command in the root directory of your Node-RED install (typically ~/.node-red)
 
-    npm install node-red-contrib-rdkafka-tzl
+    npm install --save TheZombieLives/node-red-contrib-rdkafka-tzl#master
 
 You may see a lot of warnings as librdkafka compiles and installs, particularily on MacOS, but it does work.
 
