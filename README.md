@@ -1,25 +1,36 @@
-node-red-contrib-rdkafka
-========================
+node-red-contrib-rdkafka-tzl
+============================
 
 Node-RED (http://nodered.org) nodes for publish/subscribe messaging using the new Apache Kafka Consumer/Producer API and without requiring direct communications with Zookeeper. Based on the the high performance librdkafka Apache Kafka C/C++ library (https://github.com/edenhill/librdkafka).
 
+This project was forked from https://github.com/hjespers/node-red-contrib-rdkafka to add support for ssl connections.
+
+# Known issues
+
+* No tests yet
+* Logging and debug feedback is inconsistent
+* Not as DRY as it could be
+* Error handling/propagation from dependencies is limited
 
 # Features
 
-* Up to date support for Apache Kafka 0.9, 0.10, and 0.11 including Confluent version 2.x and 3.x
-* High performance through use of librdkafka C/C++ library (see https://github.com/edenhill/librdkafka) 
-* Up to date feature set from use of node-rdkafka node.js client (see https://github.com/Blizzard/node-rdkafka)
-* Tested on Linux, macOS, and Raspberry Pi / Raspbian Jessie
-* Supports dynamic topic selection via incoming msg.topic value
-* Supports dynamic partition selection via incoming msg.partition value
-* Supports event time timestamps (with Kafka 0.10+) via msg/timestamp value
-* Uses `auto.offset.commit` to commit consumers offsets 
+* Origianl Project:
+** Up to date support for Apache Kafka 0.9, 0.10, and 0.11 including Confluent version 2.x and 3.x
+** High performance through use of librdkafka C/C++ library (see https://github.com/edenhill/librdkafka) 
+** Up to date feature set from use of node-rdkafka node.js client (see https://github.com/Blizzard/node-rdkafka)
+** Tested on Linux, macOS, and Raspberry Pi / Raspbian Jessie
+** Supports dynamic topic selection via incoming msg.topic value
+** Supports dynamic partition selection via incoming msg.partition value
+** Supports event time timestamps (with Kafka 0.10+) via msg/timestamp value
+** Uses `auto.offset.commit` to commit consumers offsets 
+* TZL fork:
+** Supports ssl connection for hosted kafka (eg https://aiven.io)
 
 # Install
 
 Run the following command in the root directory of your Node-RED install (typically ~/.node-red)
 
-    npm install node-red-contrib-rdkafka
+    npm install node-red-contrib-rdkafka-tzl
 
 You may see a lot of warnings as librdkafka compiles and installs, particularily on MacOS, but it does work.
 
@@ -51,9 +62,10 @@ Publish and subscribe just as you would with the mqtt node with some small diffe
 </ul>
 
 # Author
+Hans Jespersen, https://github.com/hjespers (node-red-contrib-rdkafka)
 
-Hans Jespersen, https://github.com/hjespers
+Tom Parkinson, https://github.com/TheZombieLives (node-red-contrib-rdkafka-tzl fork)
 
 # Feedback and Support
 
-For more information, feedback, or support see https://github.com/hjespers/node-red-contrib-rdkafka/issues
+For more information, feedback, or support see https://github.com/TheZombieLives/node-red-contrib-rdkafka-tzl/issues
